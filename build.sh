@@ -421,7 +421,7 @@ BuildRocketMQClient() {
     exit 1
   fi
   #sudo make install
-  PackageRocketMQStatic
+  # PackageRocketMQStatic
 }
 
 BuildGoogleTest() {

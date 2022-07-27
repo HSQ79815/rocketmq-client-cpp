@@ -38,37 +38,30 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
 set(CMAKE_CONFIGURATION_TYPES "Release")
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+# set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 option(BUILD_ROCKETMQ_STATIC "build rocketmq-client static library" ON)
 option(BUILD_ROCKETMQ_SHARED "build rocketmq-client shared library" ON)
 
-option(OPENSSL_USE_STATIC_LIBS "only find openssl static libs" ON) # only find static libs
-if (WIN32)
-    find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS)
-    if (OPENSSL_FOUND)
-        include_directories(${OPENSSL_INCLUDE_DIR})
-        message(STATUS "** OpenSSL Include dir: ${OPENSSL_INCLUDE_DIR}")
-        message(STATUS "** OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
-    endif ()
-else ()
-    #find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS)
-    set(OPENSSL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/bin/include)
-    set(OPENSSL_LIBRARIES_DIR ${PROJECT_SOURCE_DIR}/bin/lib)
-    set(OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES_DIR}/libssl.a;${OPENSSL_LIBRARIES_DIR}/libcrypto.a)
+
+find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS)
+if (OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIR})
+    message(STATUS "** OpenSSL Include dir: ${OPENSSL_INCLUDE_DIR}")
+    message(STATUS "** OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
 endif ()
+
 message(STATUS "** OpenSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
 message(STATUS "** OpenSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
 
-#Find dependency 
-option(Boost_USE_STATIC_LIBS "only find boost static libs" ON) # only find static libs
+add_definitions(-DBOOST_LOG_DYN_LINK)
+
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 if (WIN32)
     find_package(Boost 1.56 REQUIRED COMPONENTS atomic thread system chrono date_time
-            log log_setup regex serialization filesystem locale iostreams zlib)
+            log log_setup regex serialization filesystem locale iostreams)
     if (Boost_FOUND)
         message(STATUS "** Boost Include dir: ${Boost_INCLUDE_DIR}")
         message(STATUS "** Boost Libraries dir: ${Boost_LIBRARY_DIRS}")
@@ -77,17 +70,20 @@ if (WIN32)
     endif ()
 else ()
     #find_package(Boost 1.56 REQUIRED COMPONENTS atomic thread system chrono date_time log log_setup regex serialization filesystem locale iostreams) 
-    set(Boost_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/bin/include)
-    set(Boost_LIBRARY_DIRS ${PROJECT_SOURCE_DIR}/bin/lib)
-    set(Boost_LIBRARIES ${Boost_LIBRARY_DIRS}/libboost_atomic.a;${Boost_LIBRARY_DIRS}/libboost_thread.a;${Boost_LIBRARY_DIRS}/libboost_system.a;
-            ${Boost_LIBRARY_DIRS}/libboost_chrono.a;${Boost_LIBRARY_DIRS}/libboost_date_time.a;${Boost_LIBRARY_DIRS}/libboost_log.a;
-            ${Boost_LIBRARY_DIRS}/libboost_log_setup.a;${Boost_LIBRARY_DIRS}/libboost_regex.a;${Boost_LIBRARY_DIRS}/libboost_serialization.a;
-            ${Boost_LIBRARY_DIRS}/libboost_filesystem.a;${Boost_LIBRARY_DIRS}/libboost_locale.a;${Boost_LIBRARY_DIRS}/libboost_iostreams.a)
+    set(Boost_INCLUDE_DIR /usr/include)
+    set(Boost_LIBRARY_DIRS /usr/lib/x86_64-linux-gnu)
+    set(Boost_LIBRARIES boost_atomic;boost_thread;boost_system;
+            boost_chrono;boost_date_time;boost_log;
+            boost_log_setup;boost_regex;boost_serialization;
+            boost_filesystem;boost_locale;boost_iostreams)
     include_directories(${Boost_INCLUDE_DIR})
 endif ()
 
 message(STATUS "** Boost_INCLUDE_DIR: ${Boost_INCLUDE_DIR}")
 message(STATUS "** Boost_LIBRARIES: ${Boost_LIBRARIES}")
+
+link_directories(/usr/lib/x86_64-linux-gnu)
+# link_directories(/usr/local/lib/x86_64-linux-gnu)
 
 option(Libevent_USE_STATIC_LIBS "only find libevent static libs" ON) # only find static libs
 if (WIN32)
@@ -99,10 +95,9 @@ if (WIN32)
     endif ()
 else ()
     #find_package(Libevent 2.0.22 REQUIRED COMPONENTS)
-    set(LIBEVENT_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/bin/include)
-    set(LIBEVENT_LIBRARIES_DIR ${PROJECT_SOURCE_DIR}/bin/lib)
-    set(LIBEVENT_LIBRARIES ${LIBEVENT_LIBRARIES_DIR}/libevent.a;${LIBEVENT_LIBRARIES_DIR}/libevent_core.a;${LIBEVENT_LIBRARIES_DIR}/libevent_extra.a;
-            ${LIBEVENT_LIBRARIES_DIR}/libevent_pthreads.a;${LIBEVENT_LIBRARIES_DIR}/libevent_openssl.a)
+    set(LIBEVENT_INCLUDE_DIRS /usr/include)
+    set(LIBEVENT_LIBRARIES_DIR /usr/lib/x86_64-linux-gnu)
+    set(LIBEVENT_LIBRARIES event;event_core;event_extra;event_pthreads;event_openssl)
     include_directories(${LIBEVENT_INCLUDE_DIRS})
 endif ()
 
@@ -116,9 +111,11 @@ if (WIN32)
         include_directories(${JSONCPP_INCLUDE_DIRS})
     endif ()
 else ()
-    set(JSONCPP_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/bin/include/jsoncpp)
-    set(JSONCPP_LIBRARIES_DIR ${PROJECT_SOURCE_DIR}/bin/lib)
-    set(JSONCPP_LIBRARIES ${JSONCPP_LIBRARIES_DIR}/libjsoncpp.a)
+    # set(JSONCPP_INCLUDE_DIRS /usr/local/include/jsoncpp)
+    # set(JSONCPP_LIBRARIES_DIR /usr/local/lib/x86_64-linux-gnu)
+    set(JSONCPP_INCLUDE_DIRS /usr/include/jsoncpp)
+    set(JSONCPP_LIBRARIES_DIR /usr/lib/x86_64-linux-gnu)
+    set(JSONCPP_LIBRARIES jsoncpp)
     include_directories(${JSONCPP_INCLUDE_DIRS})
 endif ()
 
